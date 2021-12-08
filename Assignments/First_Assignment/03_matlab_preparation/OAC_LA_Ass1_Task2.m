@@ -43,10 +43,15 @@ omega = measurements_3.signals.values(:,5);
 domega = measurements_3.signals.values(:,6);
 t_measurements_3 = measurements_3.time(:,1);
 
+p_L1 = perfrom_optimization(i_A, phi, v_W, omega, domega, l, g, 'L1');
+p_L2 = perfrom_optimization(i_A, phi, v_W, omega, domega, l, g, 'L2');
+p_Linfty = perfrom_optimization(i_A, phi, v_W, omega, domega, l, g, 'Linfty');
 
-test = perfrom_optimization(i_A, phi, v_W, omega, domega, l, g, 'Linfty');
 
-
+%% Task 2c.)
+parms_L1 = solve_LGS_large_pendulum(p_L1, domega(1), l, g, phi(1), omega(1), i_A(1), v_W(1))
+parms_L2 = solve_LGS_large_pendulum(p_L2, domega(1), l, g, phi(1), omega(1), i_A(1), v_W(1))
+parms_Linfty = solve_LGS_large_pendulum(p_Linfty, domega(1), l, g, phi(1), omega(1), i_A(1), v_W(1))
 
 
 
@@ -90,12 +95,30 @@ function [phat] = perfrom_optimization(i_A, phi, v_W, omega, domega, l, g, norm)
     
     % calculate the unknown parameter based on the optimization variable
     phat = value(phat); % Convert results in double variables
-    
-    %{
-    l = g/phat; % Compute results
 
-    disp(['Length l yielded by the ', norm, ' optimization: l= ', num2str(l), 'm']);
-    %}
 end
+
+
+function params = solve_LGS_large_pendulum(p, domega, l, g, phi, omega, i_A, v_W)
+    % TODO: maybe find another 4th equation and verify the results... i
+    % think the outcome is wrong
+    
+    syms ms mw V k1
+    
+    eq4 = domega*l - g*sin(phi) == p(1)*( l*domega * (cos(phi))^2 - ...
+        l*omega^2*sin(phi)*cos(phi) ) + p(2)*(cos(phi)*i_A) + ...
+        p(3)*(cos(phi)*v_W);
+    
+    eq_system = [ms/(mw+ms) == p(1), -V/(mw+ms) == p(2), ...
+                 k1/(mw+ms) == p(3), eq4];
+    
+    S = solve(eq_system, [ms,mw,V,k1]);
+    
+    params = [double(S.ms), double(S.mw), double(S.V), double(S.k1)];
+
+end
+
+
+
 
 
