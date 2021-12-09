@@ -60,7 +60,7 @@ omega_0 = omega(1);
 l = [l_L1; l_L2; l_Linfty];
 sim('OAC_LA_Ass1_Task1_simu.slx', t_measurements_1(end));
 
-plot_opti_results(t_measurements_1, phi, phi_simu);
+compare_phi(t_measurements_1, phi, phi_simu);
 suptitle('Optimization Results Compared to Measurement Results Used for the Optimization');
 
 
@@ -82,7 +82,7 @@ omega_0 = omega(1);
 
 sim('OAC_LA_Ass1_Task1_simu.slx', t_measurements_2(end));
 
-plot_opti_results(t_measurements_2, phi, phi_simu);
+compare_phi(t_measurements_2, phi, phi_simu);
 suptitle('Optimization Results Compared to Measurement Results "measurements\_2" ');
 
 
@@ -134,7 +134,7 @@ end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function plot_opti_results(t_measurements, phi, phi_simu)
+function compare_phi(t_measurements, phi, phi_simu)
     
     % plot the results in a figure
     figure()

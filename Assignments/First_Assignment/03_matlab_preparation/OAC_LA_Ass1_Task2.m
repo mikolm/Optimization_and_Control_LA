@@ -49,10 +49,88 @@ p_Linfty = perfrom_optimization(i_A, phi, v_W, omega, domega, l, g, 'Linfty');
 
 
 %% Task 2c.)
-parms_L1 = solve_LGS_large_pendulum(p_L1, domega(1), l, g, phi(1), omega(1), i_A(1), v_W(1))
-parms_L2 = solve_LGS_large_pendulum(p_L2, domega(1), l, g, phi(1), omega(1), i_A(1), v_W(1))
-parms_Linfty = solve_LGS_large_pendulum(p_Linfty, domega(1), l, g, phi(1), omega(1), i_A(1), v_W(1))
+params_L1 = solve_LGS_large_pendulum(p_L1, domega(1), l, g, phi(1), omega(1), i_A(1), v_W(1))
+params_L2 = solve_LGS_large_pendulum(p_L2, domega(1), l, g, phi(1), omega(1), i_A(1), v_W(1))
+params_Linfty = solve_LGS_large_pendulum(p_Linfty, domega(1), l, g, phi(1), omega(1), i_A(1), v_W(1))
 
+
+%% Task 2e.)
+
+% initial values
+x0 = [x_W(1); phi(1); v_W(1); omega(1)];
+
+opt_params = params_L1;
+sim('OAC_LA_Ass1_Task2_simu.slx',t_measurements_3(end));
+phi_simu_L1 = phi_simu;
+x_W_simu_L1 = x_W_simu;
+
+opt_params = params_L2;
+sim('OAC_LA_Ass1_Task2_simu.slx',t_measurements_3(end));
+phi_simu_L2 = phi_simu;
+x_W_simu_L2 = x_W_simu;
+
+opt_params = params_Linfty;
+sim('OAC_LA_Ass1_Task2_simu.slx',t_measurements_3(end));
+phi_simu_Linfty = phi_simu;
+x_W_simu_Linfty = x_W_simu;
+
+% collect simdata of the angle phi in one struct
+phi_simu.signals.values(:,3) = phi_simu.signals.values(:,1); 
+phi_simu.signals.values(:,2) = phi_simu_L2.signals.values(:,1); 
+phi_simu.signals.values(:,1) = phi_simu_L1.signals.values(:,1); 
+compare_phi(t_measurements_3, phi, phi_simu);
+suptitle('Optimization Results Compared to Measurement Results Used for the Optimization');
+
+% collect simdata of x_W in one struct
+x_W_simu.signals.values(:,3) = x_W_simu.signals.values(:,1);
+x_W_simu.signals.values(:,2) = x_W_simu_L2.signals.values(:,1);
+x_W_simu.signals.values(:,1) = x_W_simu_L1.signals.values(:,1);
+compare_x_w(t_measurements_3, x_W, x_W_simu);
+suptitle('Optimization Results Compared to Measurement Results Used for the Optimization');
+
+
+%% Task 2.f.)
+load('measurements_4.mat');
+
+i_A = measurements_4.signals.values(:,1);
+x_W = measurements_4.signals.values(:,2);
+phi = measurements_4.signals.values(:,3);
+v_W = measurements_4.signals.values(:,4);
+omega = measurements_4.signals.values(:,5);
+domega = measurements_4.signals.values(:,6);
+t_measurements_3 = measurements_4.time(:,1);
+
+% initial values
+x0 = [x_W(1); phi(1); v_W(1); omega(1)];
+
+opt_params = params_L1;
+sim('OAC_LA_Ass1_Task2_simu.slx',t_measurements_3(end));
+phi_simu_L1 = phi_simu;
+x_W_simu_L1 = x_W_simu;
+
+opt_params = params_L2;
+sim('OAC_LA_Ass1_Task2_simu.slx',t_measurements_3(end));
+phi_simu_L2 = phi_simu;
+x_W_simu_L2 = x_W_simu;
+
+opt_params = params_Linfty;
+sim('OAC_LA_Ass1_Task2_simu.slx',t_measurements_3(end));
+phi_simu_Linfty = phi_simu;
+x_W_simu_Linfty = x_W_simu;
+
+% collect simdata of the angle phi in one struct
+phi_simu.signals.values(:,3) = phi_simu.signals.values(:,1); 
+phi_simu.signals.values(:,2) = phi_simu_L2.signals.values(:,1); 
+phi_simu.signals.values(:,1) = phi_simu_L1.signals.values(:,1); 
+compare_phi(t_measurements_3, phi, phi_simu);
+suptitle('Optimization Results Compared to Measurement Results "measurements\_4" ');
+
+% collect simdata of x_W in one struct
+x_W_simu.signals.values(:,3) = x_W_simu.signals.values(:,1);
+x_W_simu.signals.values(:,2) = x_W_simu_L2.signals.values(:,1);
+x_W_simu.signals.values(:,1) = x_W_simu_L1.signals.values(:,1);
+compare_x_w(t_measurements_3, x_W, x_W_simu);
+suptitle('Optimization Results Compared to Measurement Results "measurements\_4" ');
 
 
 
@@ -99,26 +177,100 @@ function [phat] = perfrom_optimization(i_A, phi, v_W, omega, domega, l, g, norm)
 end
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function params = solve_LGS_large_pendulum(p, domega, l, g, phi, omega, i_A, v_W)
     % TODO: maybe find another 4th equation and verify the results... i
     % think the outcome is wrong
     
-    syms ms mw V k1
+    syms mw V k1
     
-    eq4 = domega*l - g*sin(phi) == p(1)*( l*domega * (cos(phi))^2 - ...
-        l*omega^2*sin(phi)*cos(phi) ) + p(2)*(cos(phi)*i_A) + ...
-        p(3)*(cos(phi)*v_W);
+    ms = 0.5;
     
+    %eq4 = domega*l - g*sin(phi) == p(1)*( l*domega * (cos(phi))^2 - ...
+    %    l*omega^2*sin(phi)*cos(phi) ) + p(2)*(cos(phi)*i_A) + ...
+    %    p(3)*(cos(phi)*v_W);
+             
     eq_system = [ms/(mw+ms) == p(1), -V/(mw+ms) == p(2), ...
-                 k1/(mw+ms) == p(3), eq4];
+                 k1/(mw+ms) == p(3)];
     
-    S = solve(eq_system, [ms,mw,V,k1]);
+    S = solve(eq_system, [mw,V,k1]);
     
-    params = [double(S.ms), double(S.mw), double(S.V), double(S.k1)];
+    params = [double(ms), double(S.mw), double(S.V), double(S.k1)];
 
 end
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function compare_phi(t_measurements, phi, phi_simu)
+    
+    % plot the results in a figure
+    figure()
+        set(gcf, 'Units', 'Normalized', 'Position', [0, 0, 0.8, 0.9]);
+        %
+        subplot(3,1,1)
+        plot(t_measurements, phi, 'linewidth', 2);
+        hold on; box on; grid on;
+        plot(phi_simu.time(:), phi_simu.signals.values(:,1), '--', 'linewidth', 2);
+        title('Result of the $L_1$ Optimization', 'Interpreter', 'Latex','Fontsize', 14);
+        xlabel('t in s', 'Interpreter', 'Latex', 'Fontsize', 12); 
+        ylabel('$\varphi$ in rad', 'Interpreter', 'Latex','Fontsize', 12);
+        %ylim([0,2*pi]); yticks([0:pi/2:2*pi]);
+        %yticklabels({'0','pi/2','pi', '3/2 pi', '2pi'});
+        %
+        subplot(3,1,2)
+        plot(t_measurements, phi, 'linewidth', 2);
+        hold on; box on; grid on;
+        plot(phi_simu.time(:), phi_simu.signals.values(:,2), '--', 'linewidth', 2);
+        title('Result of the $L_2$ Optimization', 'Interpreter', 'Latex','Fontsize', 14);
+        xlabel('t in s', 'Interpreter', 'Latex', 'Fontsize', 12); 
+        ylabel('$\varphi$ in rad', 'Interpreter', 'Latex','Fontsize', 12);
+        %ylim([0,2*pi]); yticks([0:pi/2:2*pi]);
+        %yticklabels({'0','pi/2','pi', '3/2 pi', '2pi'});
+        %
+        subplot(3,1,3)
+        plot(t_measurements, phi, 'linewidth', 2);
+        hold on; box on; grid on;
+        plot(phi_simu.time(:), phi_simu.signals.values(:,3), '--', 'linewidth', 2);
+        title('test', 'Fontsize', 16); 
+        title('Result of the $L_\infty$ Optimization', 'Interpreter', 'Latex','Fontsize', 14);
+        xlabel('t in s', 'Interpreter', 'Latex', 'Fontsize', 12); 
+        ylabel('$\varphi$ in rad', 'Interpreter', 'Latex','Fontsize', 12);
+        %ylim([0,2*pi]); yticks([0:pi/2:2*pi]);
+        %yticklabels({'0','pi/2','pi', '3/2 pi', '2pi'});
+
+end
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function compare_x_w(t_measurements, x_W, x_W_simu)
+    
+    % plot the results in a figure
+    figure()
+        set(gcf, 'Units', 'Normalized', 'Position', [0, 0, 0.8, 0.9]);
+        %
+        subplot(3,1,1)
+        plot(t_measurements, x_W, 'linewidth', 2);
+        hold on; box on; grid on;
+        plot(x_W_simu.time(:), x_W_simu.signals.values(:,1), '--', 'linewidth', 2);
+        title('Result of the $L_1$ Optimization', 'Interpreter', 'Latex','Fontsize', 14);
+        xlabel('t in s', 'Interpreter', 'Latex', 'Fontsize', 12); 
+        ylabel('$x_W$ in m', 'Interpreter', 'Latex','Fontsize', 12);
+        %
+        subplot(3,1,2)
+        plot(t_measurements, x_W, 'linewidth', 2);
+        hold on; box on; grid on;
+        plot(x_W_simu.time(:), x_W_simu.signals.values(:,2), '--', 'linewidth', 2);
+        title('Result of the $L_2$ Optimization', 'Interpreter', 'Latex','Fontsize', 14);
+        xlabel('t in s', 'Interpreter', 'Latex', 'Fontsize', 12); 
+        ylabel('$x_W$ in m', 'Interpreter', 'Latex','Fontsize', 12);
+        %
+        subplot(3,1,3)
+        plot(t_measurements, x_W, 'linewidth', 2);
+        hold on; box on; grid on;
+        plot(x_W_simu.time(:), x_W_simu.signals.values(:,3), '--', 'linewidth', 2);
+        title('test', 'Fontsize', 16); 
+        title('Result of the $L_\infty$ Optimization', 'Interpreter', 'Latex','Fontsize', 14);
+        xlabel('t in s', 'Interpreter', 'Latex', 'Fontsize', 12); 
+        ylabel('$x_W$ in m', 'Interpreter', 'Latex','Fontsize', 12);
 
+end
