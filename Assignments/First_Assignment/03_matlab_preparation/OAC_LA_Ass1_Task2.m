@@ -43,9 +43,9 @@ omega = measurements_3.signals.values(:,5);
 domega = measurements_3.signals.values(:,6);
 t_measurements_3 = measurements_3.time(:,1);
 
-p_L1 = perfrom_optimization(i_A, phi, v_W, omega, domega, l, g, 'L1');
-p_L2 = perfrom_optimization(i_A, phi, v_W, omega, domega, l, g, 'L2');
-p_Linfty = perfrom_optimization(i_A, phi, v_W, omega, domega, l, g, 'Linfty');
+p_L1 = perfrom_optimization_large_pendulum(i_A, phi, v_W, omega, domega, l, g, 'L1');
+p_L2 = perfrom_optimization_large_pendulum(i_A, phi, v_W, omega, domega, l, g, 'L2');
+p_Linfty = perfrom_optimization_large_pendulum(i_A, phi, v_W, omega, domega, l, g, 'Linfty');
 
 
 %% Task 2c.)
@@ -59,32 +59,11 @@ params_Linfty = solve_LGS_large_pendulum(p_Linfty, domega(1), l, g, phi(1), omeg
 % initial values
 x0 = [x_W(1); phi(1); v_W(1); omega(1)];
 
-opt_params = params_L1;
 sim('OAC_LA_Ass1_Task2_simu.slx',t_measurements_3(end));
-phi_simu_L1 = phi_simu;
-x_W_simu_L1 = x_W_simu;
 
-opt_params = params_L2;
-sim('OAC_LA_Ass1_Task2_simu.slx',t_measurements_3(end));
-phi_simu_L2 = phi_simu;
-x_W_simu_L2 = x_W_simu;
-
-opt_params = params_Linfty;
-sim('OAC_LA_Ass1_Task2_simu.slx',t_measurements_3(end));
-phi_simu_Linfty = phi_simu;
-x_W_simu_Linfty = x_W_simu;
-
-% collect simdata of the angle phi in one struct
-phi_simu.signals.values(:,3) = phi_simu.signals.values(:,1); 
-phi_simu.signals.values(:,2) = phi_simu_L2.signals.values(:,1); 
-phi_simu.signals.values(:,1) = phi_simu_L1.signals.values(:,1); 
 compare_phi(t_measurements_3, phi, phi_simu);
 suptitle('Optimization Results Compared to Measurement Results Used for the Optimization');
 
-% collect simdata of x_W in one struct
-x_W_simu.signals.values(:,3) = x_W_simu.signals.values(:,1);
-x_W_simu.signals.values(:,2) = x_W_simu_L2.signals.values(:,1);
-x_W_simu.signals.values(:,1) = x_W_simu_L1.signals.values(:,1);
 compare_x_w(t_measurements_3, x_W, x_W_simu);
 suptitle('Optimization Results Compared to Measurement Results Used for the Optimization');
 
@@ -103,36 +82,13 @@ t_measurements_3 = measurements_4.time(:,1);
 % initial values
 x0 = [x_W(1); phi(1); v_W(1); omega(1)];
 
-opt_params = params_L1;
 sim('OAC_LA_Ass1_Task2_simu.slx',t_measurements_3(end));
-phi_simu_L1 = phi_simu;
-x_W_simu_L1 = x_W_simu;
 
-opt_params = params_L2;
-sim('OAC_LA_Ass1_Task2_simu.slx',t_measurements_3(end));
-phi_simu_L2 = phi_simu;
-x_W_simu_L2 = x_W_simu;
-
-opt_params = params_Linfty;
-sim('OAC_LA_Ass1_Task2_simu.slx',t_measurements_3(end));
-phi_simu_Linfty = phi_simu;
-x_W_simu_Linfty = x_W_simu;
-
-% collect simdata of the angle phi in one struct
-phi_simu.signals.values(:,3) = phi_simu.signals.values(:,1); 
-phi_simu.signals.values(:,2) = phi_simu_L2.signals.values(:,1); 
-phi_simu.signals.values(:,1) = phi_simu_L1.signals.values(:,1); 
 compare_phi(t_measurements_3, phi, phi_simu);
 suptitle('Optimization Results Compared to Measurement Results "measurements\_4" ');
 
-% collect simdata of x_W in one struct
-x_W_simu.signals.values(:,3) = x_W_simu.signals.values(:,1);
-x_W_simu.signals.values(:,2) = x_W_simu_L2.signals.values(:,1);
-x_W_simu.signals.values(:,1) = x_W_simu_L1.signals.values(:,1);
 compare_x_w(t_measurements_3, x_W, x_W_simu);
 suptitle('Optimization Results Compared to Measurement Results "measurements\_4" ');
-
-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -140,7 +96,7 @@ suptitle('Optimization Results Compared to Measurement Results "measurements\_4"
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [phat] = perfrom_optimization(i_A, phi, v_W, omega, domega, l, g, norm)
+function [phat] = perfrom_optimization_large_pendulum(i_A, phi, v_W, omega, domega, l, g, norm)
 
     yalmip('clear') % delete old yalmip variables
 
@@ -237,7 +193,6 @@ function compare_phi(t_measurements, phi, phi_simu)
         ylabel('$\varphi$ in rad', 'Interpreter', 'Latex','Fontsize', 12);
         %ylim([0,2*pi]); yticks([0:pi/2:2*pi]);
         %yticklabels({'0','pi/2','pi', '3/2 pi', '2pi'});
-
 end
 
 
@@ -272,5 +227,4 @@ function compare_x_w(t_measurements, x_W, x_W_simu)
         title('Result of the $L_\infty$ Optimization', 'Interpreter', 'Latex','Fontsize', 14);
         xlabel('t in s', 'Interpreter', 'Latex', 'Fontsize', 12); 
         ylabel('$x_W$ in m', 'Interpreter', 'Latex','Fontsize', 12);
-
 end
