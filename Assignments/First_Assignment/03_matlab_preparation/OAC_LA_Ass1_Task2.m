@@ -135,16 +135,10 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function params = solve_LGS_large_pendulum(p, domega, l, g, phi, omega, i_A, v_W)
-    % TODO: maybe find another 4th equation and verify the results... i
-    % think the outcome is wrong
     
     syms mw V k1
     
-    ms = 0.5;
-    
-    %eq4 = domega*l - g*sin(phi) == p(1)*( l*domega * (cos(phi))^2 - ...
-    %    l*omega^2*sin(phi)*cos(phi) ) + p(2)*(cos(phi)*i_A) + ...
-    %    p(3)*(cos(phi)*v_W);
+    ms = 0.5; % kg
              
     eq_system = [ms/(mw+ms) == p(1), -V/(mw+ms) == p(2), ...
                  k1/(mw+ms) == p(3)];
