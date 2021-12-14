@@ -19,7 +19,7 @@ classdef Task1_Funcs
             if strcmp(norm,'L1')
                 diagnostics = optimize(constraints,sum(bounds),options)    
             elseif strcmp(norm,'L2')
-                diagnostics = optimize(constraints,sum(bounds'*bounds),options)       
+                diagnostics = optimize([],e'*e,options)       
             elseif strcmp(norm,'Linfty')
                 diagnostics = optimize(constraints,max(bounds),options)        
             else

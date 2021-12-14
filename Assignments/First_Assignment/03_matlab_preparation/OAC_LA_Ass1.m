@@ -14,7 +14,7 @@
 
 % tidy up Matlab
 clear all; close all; clc;
-format long
+format shorteng
 format compact
 
 
@@ -180,11 +180,11 @@ eq_system = [v_W_eq == 0, ...
 S = solve(eq_system, [F_eq, phi_eq, v_W_eq, omega_eq]);
 
 eq_points = [double(S.F_eq), double(S.phi_eq), double(S.v_W_eq), double(S.omega_eq)]
-
+%%
 %}
 
 % IC for the linmod simulation
-x0 = [0; 0; 0; 0];
+x0 = [0; deg2rad(10); 0; 0];
 
 x_eq = zeros(4,1);
 F_eq = 0;
@@ -194,17 +194,16 @@ F_eq = 0;
 %% Design of the LQR controller 
 
 % weightings
+Q = zeros(4,4);
 Q(1,1) = 100;
 Q(2,2) = 1;
-Q(3,3) = 1e-3;
-Q(4,4) = 1e-3;
 
 R = 1; % limitation of the control action
 
 kT = lqr(A,B,Q,R);
 
 %% Visualization of the movement
-x0_lin = [0, deg2rad(80), 0, 0]';
+x0_lin = [0, deg2rad(30), 0, 0]';
 
 sim('OAC_LA_Ass1_Task3_linearized_model.slx',3);
 
