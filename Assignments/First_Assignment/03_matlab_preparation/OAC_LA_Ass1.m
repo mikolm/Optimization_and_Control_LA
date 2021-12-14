@@ -204,7 +204,7 @@ R = 1; % limitation of the control action
 kT = lqr(A,B,Q,R);
 
 %% Visualization of the movement
-x0_lin = [0, deg2rad(60), 0, 0]';
+x0_lin = [0, deg2rad(80), 0, 0]';
 
 sim('OAC_LA_Ass1_Task3_linearized_model.slx',3);
 
