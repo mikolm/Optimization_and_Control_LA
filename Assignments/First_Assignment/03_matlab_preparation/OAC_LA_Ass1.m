@@ -37,8 +37,8 @@ domega = measurements_1.signals.values(:,3);
 t_measurements_1 = measurements_1.time(:);
 
 % use this vector to show the difference between the different optimization 
-% methods - random noise is added to the measurement values 
-%domega = measurements_1.signals.values(:,3) + 20*randn(size(measurements_1.signals.values(:,1)));
+% methods - random noise is added to the measurement value domega 
+%domega = measurements_1.signals.values(:,3) + 10*randn(size(measurements_1.signals.values(:,1)));
 
 l_L1 = Task1_Funcs.perfrom_optimization(phi, domega, g, 'L1');
 l_L2 = Task1_Funcs.perfrom_optimization(phi, domega, g, 'L2');
@@ -107,13 +107,11 @@ p_L1 = Task2_Funcs.perfrom_optimization_large_pendulum(i_A, phi, v_W, omega, dom
 p_L2 = Task2_Funcs.perfrom_optimization_large_pendulum(i_A, phi, v_W, omega, domega, l, g, 'L2');
 p_Linfty = Task2_Funcs.perfrom_optimization_large_pendulum(i_A, phi, v_W, omega, domega, l, g, 'Linfty');
 
-
 % --------------------------------------------------------------------------- %
 %% Task 2c.)
 params_L1 = Task2_Funcs.solve_LGS_large_pendulum(p_L1, domega(1), l, g, phi(1), omega(1), i_A(1), v_W(1))
 params_L2 = Task2_Funcs.solve_LGS_large_pendulum(p_L2, domega(1), l, g, phi(1), omega(1), i_A(1), v_W(1))
 params_Linfty = Task2_Funcs.solve_LGS_large_pendulum(p_Linfty, domega(1), l, g, phi(1), omega(1), i_A(1), v_W(1))
-
 
 % --------------------------------------------------------------------------- %
 %% Task 2e.)
@@ -128,7 +126,6 @@ suptitle('Optimization Results Compared to Measurement Results Used for the Opti
 
 Task2_Funcs.compare_x_w(t_measurements_3, x_W, x_W_simu);
 suptitle('Optimization Results Compared to Measurement Results Used for the Optimization');
-
 
 % --------------------------------------------------------------------------- %
 %% Task 2.f.)
@@ -153,9 +150,9 @@ suptitle('Optimization Results Compared to Measurement Results "measurements\_4"
 Task2_Funcs.compare_x_w(t_measurements_3, x_W, x_W_simu);
 suptitle('Optimization Results Compared to Measurement Results "measurements\_4" ');
 
-
+% best optimisation result
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-ms = params_L1(1); % best optimisation result
+ms = params_L1(1); 
 mw = params_L1(2);
 V = params_L1(3);
 k1 = params_L1(4);
@@ -165,48 +162,37 @@ k1 = params_L1(4);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % --------------------------------------------------------------------------- %
-params = [ms, mw, V, k1];
+all_params = [l, ms, mw, V, k1];
 
 %% Linearization around the upper equilibrium point
-% done with matlab 
-%{
-syms F_eq phi_eq v_W_eq omega_eq
 
-eq_system = [v_W_eq == 0, ...
-             omega_eq == 0, ...
-             1/( mw + ms*(1-(cos(phi_eq))^2) ) * ( F_eq + ms*l*omega_eq^2*sin(phi_eq) - ms*g*sin(phi_eq)*cos(phi_eq) ) == 0, ...
-             1/( l * ( 1 - ms/(mw+ms)*(cos(phi_eq))^2 ) ) * ( g*sin(phi_eq) - cos(phi_eq)/(ms+mw)*F_eq - ms/(mw+ms)*l*omega_eq^2*sin(phi_eq)*cos(phi_eq) ) == 0];
-    
-S = solve(eq_system, [F_eq, phi_eq, v_W_eq, omega_eq]);
-
-eq_points = [double(S.F_eq), double(S.phi_eq), double(S.v_W_eq), double(S.omega_eq)]
-%%
-%}
+%eq_points = Task3_Funcs.get_equilibrium_points(all_params,g);
+%x_eq_upper = eq_points(1,1:4)';
+%iA_eq_upper = eq_points(1,5);
+x_eq = zeros(4,1);
+iA_eq = 0;
 
 % IC for the linmod simulation
-x0 = [0; deg2rad(10); 0; 0];
+x0 = [0; deg2rad(10); 0; 0]; % IC of the linearization simulink model
 
-x_eq = zeros(4,1);
-F_eq = 0;
-
-[A,B,C,D] = linmod('OAC_LA_Ass1_Task3_linearization', x_eq, F_eq);
+[A,B,C,D] = linmod('OAC_LA_Ass1_Task3_linearization', x_eq, iA_eq);
 
 %% Design of the LQR controller 
 
 % weightings
 Q = zeros(4,4);
-Q(1,1) = 100;
+Q(1,1) = 1000;
 Q(2,2) = 1;
 
 R = 1; % limitation of the control action
 
-kT = lqr(A,B,Q,R);
+kT = lqr(A,B,Q,R)
 
 %% Visualization of the movement
-x0_lin = [0, deg2rad(30), 0, 0]';
+x0 = [0, deg2rad(45), 0, 0]';
 
-sim('OAC_LA_Ass1_Task3_linearized_model.slx',3);
+sim('OAC_LA_Ass1_Task3_full_model_lqr_controller.slx',2);
 
-Task3_Funcs.visualisation(l,lin_simdata);
+Task3_Funcs.visualisation(l,lqr_simdata);
 
 

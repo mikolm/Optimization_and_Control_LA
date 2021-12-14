@@ -1,6 +1,37 @@
 classdef Task3_Funcs
     methods(Static)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        function eq_points = get_equilibrium_points(all_params, g)
+            
+            l = all_params(1);
+            ms = all_params(2);
+            mw = all_params(3);
+            V = all_params(4);
+            k1 = all_params(5);
+            
+            %i_eq = 0;
+            
+            syms phi_eq v_W_eq omega_eq F_eq i_eq
+
+            eq_system = [% big pendulum equation
+                         F_eq == V*i_eq + k1*v_W_eq, ... 
+                         % first ODE
+                         v_W_eq == 0, ... 
+                         % second ODE
+                         omega_eq == 0, ... 
+                         % third ODE
+                         1/( mw + ms*(1-(cos(phi_eq))^2) ) * ( F_eq + ms*l*omega_eq^2*sin(phi_eq) - ms*g*sin(phi_eq)*cos(phi_eq) ) == 0, ... 
+                         % fourth ODE
+                         1/( l * ( 1 - ms/(mw+ms)*(cos(phi_eq))^2 ) ) * ( g*sin(phi_eq) - cos(phi_eq)/(ms+mw)*F_eq - ms/(mw+ms)*l*omega_eq^2*sin(phi_eq)*cos(phi_eq) ) == 0];
+
+            S = solve(eq_system, [phi_eq, v_W_eq, omega_eq, i_eq]);
+            eq_points = S;
+            
+            %eq_points = [double(S.x_W_eq), double(S.phi_eq), double(S.v_W_eq), double(S.omega_eq), double(S.i_eq)];
+        end
+        
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         function visualisation(l, lin_simdata)
 
             % variables
