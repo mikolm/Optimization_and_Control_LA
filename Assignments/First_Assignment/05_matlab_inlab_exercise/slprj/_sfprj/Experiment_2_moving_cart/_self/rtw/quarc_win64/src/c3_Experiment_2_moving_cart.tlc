@@ -1,0 +1,53 @@
+%implements "chartSource" "C"
+%function ChartConfig(block, system) void
+  %createrecord chartConfiguration { ...
+          executeAtInitialization  0 ...
+  }
+  %return chartConfiguration
+%endfunction
+%function ChartDataMap(block, system) void
+  %createrecord ChartDataElements {\
+    NumChartData   5 \
+    ChartDataDefaults {\
+      RecordType   "ChartData"\
+      Dimensions   []\
+      IsTestPoint  0\
+    }\
+    ChartData {\
+      Name         "Phi"\
+      Description  "EmlPersistent"\
+      SFName       ""\
+      Path         ""\
+      SrcLocation  "Experiment_2_moving_cart:186:848-851"\
+    }\
+    ChartData {\
+      Name         "bD"\
+      Description  "EmlPersistent"\
+      SFName       ""\
+      Path         ""\
+      SrcLocation  "Experiment_2_moving_cart:186:852-854"\
+    }\
+    ChartData {\
+      Name         "So_inv_lastCol"\
+      Description  "EmlPersistent"\
+      SFName       ""\
+      Path         ""\
+      SrcLocation  "Experiment_2_moving_cart:186:855-869"\
+    }\
+    ChartData {\
+      Name         "zp"\
+      Description  "EmlPersistent"\
+      SFName       ""\
+      Path         ""\
+      SrcLocation  "Experiment_2_moving_cart:186:876-878"\
+    }\
+    ChartData {\
+      Name         "zp_not_empty"\
+      Description  "EmlPersistentSentinel"\
+      SFName       ""\
+      Path         ""\
+      SrcLocation  "Experiment_2_moving_cart:186:876-878"\
+    }\
+  }
+  %return ChartDataElements
+%endfunction
