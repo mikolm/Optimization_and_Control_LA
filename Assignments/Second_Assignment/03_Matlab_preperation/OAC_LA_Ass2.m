@@ -175,9 +175,24 @@ sim('task5_constraint_mpc',T_sim);
 %%% =================================================================== %%%
 %% Task 7                                                                %%
 %%% =================================================================== %%%
+T_sim = 80;
 % Weight Matrices
 Q = 1*eye(p*Np);
 R = 1*eye(m*Nc);
+roh = 50;
+Nc = 80;
+Np = 80;
+
+% evaluate matrices
+[F,G,H] = Task4_Funcs.F_G_H_Matrix_calculation(Ad,Bd,Cd,Nc,Np,m,n,p);
+[Fx,Gx,Hx] = Task5_Funcs.Fx_Gx_Hx_Matrix_calculation(Ad,Bd,Nc,Np,m,n);
+
+% reference
+r2 = y_eq+h(2);
+r = zeros(T_sim/Ts,Np*m);
+r = repmat(r2,T_sim/Ts,Np);
+timesteps = (0:Ts:T_sim-Ts)';
+r = [timesteps, r];
 
 sim('task7_soft_constraint_mpc',T_sim);
 

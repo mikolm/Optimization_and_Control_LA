@@ -54,8 +54,8 @@ function delta_u_hat = MPC_function(input)
     
     W = [-M; M; -Hx; Hx];
     w_hat = [actuating_constraint; state_variable_constraint];
-    v_hat = ones(size(W,1),1);
-    constraints = W*delta_u_hat <= w_hat + v_hat * epsilon;
+    v_hat = [ones(2*size(M,1),1);ones(2*size(Hx,1),1)];
+    constraints = [W*delta_u_hat <= w_hat + v_hat * epsilon, epsilon >=0];
     %%
 
     ek_hat = gk_hat -rk;
