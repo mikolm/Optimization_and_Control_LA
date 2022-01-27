@@ -14,5 +14,15 @@ classdef Task1_Funcs
             x_eq = [double(S.x1_eq); x2_eq];
             u_eq = [double(S.u1_eq); 0];
         end
+        
+        
+        function [A_ana, B_ana] = lin_matrices_ana(x_eq,u_eq,k,beta,gamma)
+            
+            A_ana = [-k(1)/2*x_eq(1)^(-0.5), 0;
+                     k(1)/2*x_eq(1)^(-0.5), -k(2)/2*x_eq(2)^(-0.5)];
+                 
+            B_ana = [gamma(1)/2*(beta(1) + gamma(1)*u_eq(1))^(-0.5);
+                                                                  0];     
+        end
     end
 end

@@ -38,7 +38,7 @@ k = [k1; k2];
 % Sampling Time
 Ts = 0.5;
 % Simulation Time
-T_sim = 40;
+T_sim = 60;
 % Reference
 y_eq = 15;
 % Tank limits
@@ -63,11 +63,17 @@ x2_eq = y_eq+h(2);% in cm
 % matlab results of the equilibrium point
 [u_eq,x_eq] = Task1_Funcs.equilibrium(alpha, beta, gamma, k, x2_eq);
 
+% Linmod linearization
 x0=[0;0];
 [A,B,C,D] = linmod('task1_nonlin_model_simu', x_eq, u_eq(1));
-
 C = [0,1];
 D = 0;
+
+% Analytical linearization
+[A_ana, B_ana] = Task1_Funcs.lin_matrices_ana(x_eq,u_eq,k,beta,gamma);
+C = [0,1];
+D = 0;
+
 
 
 %%% =================================================================== %%%
@@ -104,6 +110,11 @@ Dd = lin_dsys.D;
 n = size(Ad,1);
 m = size(Bd,2);
 p = size(Cd,1);
+% initial condition for the linearized model
+ic_liquid_level = [10; 5]; % in cm
+
+x0_linear = -x_eq + h + ic_liquid_level;
+x0_nonlin = h + ic_liquid_level;
 
 % Function call to calculate Matrices F G and H
 [F,G,H] = Task4_Funcs.F_G_H_Matrix_calculation(Ad,Bd,Cd,Nc,Np,m,n,p);
@@ -129,7 +140,6 @@ r = repmat(r2,T_sim/Ts,Np);
 timesteps = (0:Ts:T_sim-Ts)';
 r = [timesteps, r];
 
-x0_linear = -x_eq+h;
 sim('task4_lin_nonlin_model_MPC_simu',T_sim);
 
 
@@ -176,9 +186,9 @@ sim('task5_constraint_mpc',T_sim);
 %% Task 7                                                                %%
 %%% =================================================================== %%%
 Np = 80;
-Nc = 40;
-T_sim = 80;
-roh = 500;
+Nc = 80;
+T_sim = 50;
+roh = 50;
 
 % Weight Matrices
 Q = 1*eye(p*Np);
