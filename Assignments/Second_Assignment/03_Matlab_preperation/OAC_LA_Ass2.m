@@ -38,7 +38,7 @@ k = [k1; k2];
 % Sampling Time
 Ts = 0.5;
 % Simulation Time
-T_sim = 40;
+T_sim = 80;
 % Reference
 y_eq = 15;
 % Tank limits
@@ -175,6 +175,9 @@ sim('task5_constraint_mpc',T_sim);
 %%% =================================================================== %%%
 %% Task 7                                                                %%
 %%% =================================================================== %%%
+% Weight Matrices
+Q = 1*eye(p*Np);
+R = 1*eye(m*Nc);
 
 sim('task7_soft_constraint_mpc',T_sim);
 
