@@ -121,8 +121,11 @@ x0_nonlin = h + ic_liquid_level;
 
 
 % Weight Matrices
-Q = 1*eye(p*Np);
-R = 1*eye(m*Nc);
+Q = 1*eye(p*Np); % weight tracking error
+R = 1*eye(m*Nc); % weight control action
+% additional possibility (interesting for MIMO:)
+% Q = diag(repmat([1,2,3],1,Np)) ... the vector [1,2,3] needs to be 1xp
+% Q = diag(repmat([1,2,3],1,Nc)) ... the vector [1,2,3] needs to be 1xm
 
 % Check definitnes of the matrix
 if eig(H'*Q*H+R)<=0
